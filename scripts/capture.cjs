@@ -83,6 +83,12 @@ app.whenReady().then(async () => {
             (r.querySelector('.row-anchor') || r.querySelector('.row-port')).textContent),
           startPresentOnStopped: !!rowsOf('stopped')[1].querySelector('[data-role=start]'),
           openPresentOnStopped: !!rowsOf('stopped')[1].querySelector('[data-role=open]'),
+          confirmBox: (() => {
+            const a = panel('confirm').getBoundingClientRect();
+            const b = panel('confirm-danger').getBoundingClientRect();
+            return { x: Math.floor(a.left - 12), y: Math.floor(a.top - 12),
+                     w: Math.ceil(b.right - a.left + 24), h: Math.ceil(Math.max(a.height, b.height) + 24) };
+          })(),
         } })()`,
     )
     if (geom) console.log('geometry:', JSON.stringify(geom, null, 1))

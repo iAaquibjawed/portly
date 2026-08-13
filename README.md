@@ -42,6 +42,10 @@ them without leaving the menu bar.
 - **Reads at a glance.** Protocol is encoded in *shape*, not colour — filled dot,
   ringed dot, outline square, dashed ring — so the list survives grayscale and
   colour-blindness.
+- **Says what stopping costs.** The confirm classifies the process: stopping Vite
+  and stopping Postgres do not look the same.
+- **Works in the terminal too.** `portly 3000` prints what owns a port — see
+  [The CLI](#the-cli).
 - **Keyboard first.** `⌘K` search, `↑↓` to move, `⏎` to open, `⌫` twice to stop,
   `Esc` to back out.
 
@@ -109,6 +113,32 @@ destructive. It confirms inline, reading `Stop printdrop on 4000?` — project a
 port, not PID, because the port is what you are verifying. The destructive action
 comes first, `Esc` cancels, and the row does not change height. `SIGTERM` first,
 `SIGKILL` only if the process is still alive after 1.5 seconds.
+
+### Not all stops are equal
+
+Every guide to `EADDRINUSE` ends the same way: run `lsof`, read a PID, kill it. The
+step none of them take is telling you what you are about to kill. So the confirm
+carries a chip:
+
+| chip | meaning |
+| --- | --- |
+| `dev server` | Serves HTTP from a project directory under a development runtime. Safe. |
+| `long-running` | The same, but up for over a week — unusual for a dev server. |
+| `non-HTTP service` · `unrecognised server` | Something else. Check what depends on it. |
+| `system process` | No project directory resolved: a daemon, helper or language server. |
+| `database` | A datastore. Stopping it can lose writes that were not yet flushed. |
+
+For a datastore the verb escalates to **Stop anyway** and the chip takes the warm
+colour. Classification is derived from data the scan already has — process name,
+port, resolved project, protocol, uptime — so it costs nothing.
+
+The process name is trusted over the port, deliberately: port 7000 is Cassandra's
+default, but on a Mac it is far more often AirPlay Receiver, and mislabelling
+ControlCenter as a database would train you to ignore the chip.
+
+`SIGTERM` always comes first, and `SIGKILL` only if the process ignores it for
+1.5 seconds. That is stated on the row tooltip, because a tool that can kill your
+work should say how it does it.
 
 **A stopped row keeps its place.** It stays exactly where it was, in its group,
 dimmed, with its port struck through and its uptime replaced by `stopped 12s ago`.
@@ -178,6 +208,67 @@ Read this before relying on it.
   within 10s, returns the row to its stopped state and puts the captured stderr on
   the row's tooltip and in its ⋯ menu.
 
+## Named URLs (portless)
+
+[portless](https://github.com/vercel-labs/portless) solves the same problem from
+the opposite direction: it runs a local proxy and gives each project a stable
+`https://myapp.localhost` name, so you never see the port. It ships no UI.
+
+When a listener is behind a portless route, Portly shows the name in the row's
+metadata line and opens the named URL instead of `localhost:<port>`. The port stays
+as the row's anchor, because the port is still what an `EADDRINUSE` reports and
+what you need when something else grabs it.
+
+The integration is read-only and deliberately paranoid. It reads
+`~/.portless/routes.json` — verified against portless 0.15.5 as a JSON array of
+`{ hostname, port, pid }`, matched on the same `port + pid` identity Portly already
+uses. portless is pre-1.0 and its README states that the state directory format may
+change between releases, so every failure path here is silent: a missing,
+unreadable or unfamiliar file simply means no names, and rows render exactly as
+they did before.
+
+## The CLI
+
+People hit `EADDRINUSE` and search the error, not the app. `portly` answers the
+same question from the terminal, sharing the scanner with the app so the two can
+never disagree.
+
+```
+$ portly 5173
+5173  Qafaza
+  process  node · pid 3692
+  uptime   1h 55m · 80 MB
+  url      http://localhost:5173
+  title    Qafaza — for masjids, madrasahs, and the community around them
+  cwd      /Users/you/Desktop/Qafaza/web
+  stopping dev server — Serves HTTP from a project directory under a development
+                        runtime. Safe to stop.
+```
+
+```
+$ portly
+Qafaza
+    3000  dev server          1h 56m     puma
+    5173  dev server          1h 56m     node
+    8088  long-running        8d 10h     node
+printdrop
+    4000  dev server          4d 2h      node
+
+8 of 39 listeners  (31 non-HTTP hidden — use --all)
+```
+
+| | |
+| --- | --- |
+| `portly` | every listener, grouped by project |
+| `portly <port>` | what owns a port |
+| `portly <port> --stop` | stop it, after printing what it is |
+| `portly [<port>] --json` | machine-readable |
+| `portly --all` | include non-HTTP listeners |
+
+`--stop` refuses to touch anything classified `database` — that needs a deliberate
+`kill` from you, not a convenience flag. Colour is only emitted when stdout is a
+terminal, so pipes stay clean.
+
 ## Design notes
 
 The interface borrows from macOS system UI rather than the dark-dashboard default
@@ -210,7 +301,10 @@ npm run icons          # regenerate every icon asset from shared/marks.ts
 npm run mockup         # render mockups/portly-states.png
 npm run hero           # render mockups/hero.png
 npm run tray:compare   # render the 16px tray verification sheet
+npm run build:cli      # bundle the portly CLI to dist-cli/
 ```
+
+`npm link` puts `portly` on your PATH for local testing.
 
 ### Layout
 
@@ -221,6 +315,8 @@ electron/
   project.ts   project-name resolution (git root, generic, uniqueness)
   restart.ts   argv capture via ancestor walk, persistence, spawn
   infer.ts     start-command inference from project config
+  risk.ts      what stopping a listener would cost
+  portless.ts  read-only portless route registrations
   exec.ts      shared lsof/ps/git helpers
   preload.ts   contextBridge surface (contextIsolation on, sandbox on)
 shared/
@@ -232,6 +328,8 @@ src/
   icons.tsx    the matched icon set, one 16px grid, 1.5px strokes
   tokens.css   oklch ramps, radii, spacing — light and dark
   app.css      component styles
+cli/
+  portly.ts    the terminal front-end, sharing the app's scanner
 scripts/
   icons.ts          every icon asset, rasterised through Chromium
   capture.cjs       offscreen render → mockups/*.png
