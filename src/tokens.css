@@ -1,0 +1,110 @@
+/* Design tokens, straight from the spec. One accent hue; everything else is a
+   neutral ramp. Status is shape-coded, so no token here encodes liveness. */
+
+:root {
+  --r-chip: 4px;
+  --r-field: 6px;
+  --r-popover: 8px;
+
+  --sp-1: 4px;
+  --sp-2: 8px;
+  --sp-3: 12px;
+  --sp-4: 16px;
+  --sp-5: 20px;
+  --sp-6: 24px;
+  --sp-8: 32px;
+
+  --popover-width: 400px;
+  --window-padding: 20px;
+
+  --font: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', sans-serif;
+}
+
+[data-theme='light'] {
+  --bg: #fff;
+  --border: oklch(88% 0.005 250);
+  --border-subtle: oklch(90% 0.005 250);
+  --text-primary: oklch(18% 0.008 250);
+  --text-secondary: oklch(48% 0.007 250);
+  --text-tertiary: oklch(62% 0.006 250);
+  --hover-bg: oklch(96% 0.003 250);
+  --chip-bg: oklch(92% 0.004 250);
+  --banner-bg: oklch(97% 0.003 250);
+  --skeleton: oklch(90% 0.005 250);
+  --action-hover: oklch(90% 0.005 250);
+  --action-active: oklch(84% 0.006 250);
+  --danger: oklch(52% 0.19 25);
+  --danger-bg: oklch(94% 0.032 25);
+  --selected-bg: oklch(94.5% 0.004 250);
+  --accent: oklch(52% 0.14 145);
+  --shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+}
+
+[data-theme='dark'] {
+  --bg: oklch(19% 0.006 250);
+  --border: oklch(27% 0.007 250);
+  --border-subtle: oklch(27% 0.007 250);
+  --text-primary: oklch(94% 0.004 250);
+  --text-secondary: oklch(68% 0.006 250);
+  --text-tertiary: oklch(52% 0.008 250);
+  --hover-bg: oklch(24% 0.008 250);
+  --chip-bg: oklch(28% 0.008 250);
+  --banner-bg: oklch(24% 0.008 250);
+  --skeleton: oklch(27% 0.007 250);
+  --action-hover: oklch(30% 0.01 250);
+  --action-active: oklch(36% 0.011 250);
+  --danger: oklch(68% 0.16 25);
+  --danger-bg: oklch(31% 0.055 25);
+  --selected-bg: oklch(27% 0.008 250);
+  --accent: oklch(72% 0.15 145);
+  --shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background: transparent;
+  font-family: var(--font);
+  color: var(--text-primary);
+  /* The popover is a glance, not a document. */
+  user-select: none;
+  cursor: default;
+  overflow: hidden;
+}
+
+body {
+  padding: var(--window-padding);
+}
+
+@keyframes portly-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes portly-pulse {
+  0%,
+  100% {
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 0.9;
+  }
+}
+
+@keyframes portly-restart-underline {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
