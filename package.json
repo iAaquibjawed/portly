@@ -11,13 +11,14 @@
     "fix:electron": "node scripts/fix-electron.mjs",
     "build:electron": "node scripts/build-electron.mjs",
     "build:renderer": "vite build",
-    "build": "npm run build:electron && npm run build:renderer",
+    "build": "npm run build:electron && npm run build:cli && npm run build:renderer",
     "dev": "node scripts/dev.mjs",
     "mockup": "vite build --config vite.mockups.config.ts && electron scripts/capture.cjs",
     "start": "npm run build && electron .",
     "typecheck": "tsc --noEmit -p tsconfig.json && tsc --noEmit -p tsconfig.node.json",
     "tray:compare": "vite build --config vite.mockups.config.ts && electron scripts/capture.cjs --page=traycompare.html --out=tray-candidates.png --scale=2 --measure=none",
-    "hero": "vite build --config vite.mockups.config.ts && electron scripts/capture.cjs --page=hero.html --out=hero.png --scale=2 --measure=none"
+    "hero": "vite build --config vite.mockups.config.ts && electron scripts/capture.cjs --page=hero.html --out=hero.png --scale=2 --measure=none",
+    "build:cli": "esbuild cli/portly.ts --bundle --platform=node --format=cjs --target=node20 --outfile=dist-cli/portly.cjs --banner:js=\"#!/usr/bin/env node\" --log-level=error && chmod +x dist-cli/portly.cjs"
   },
   "devDependencies": {
     "@types/react": "^19.0.7",
@@ -29,5 +30,8 @@
     "react-dom": "^19.0.0",
     "typescript": "^5.7.3",
     "vite": "^6.0.7"
+  },
+  "bin": {
+    "portly": "dist-cli/portly.cjs"
   }
 }

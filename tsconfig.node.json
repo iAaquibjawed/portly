@@ -12,5 +12,5 @@
     "noEmit": true,
     "types": ["node"]
   },
-  "include": ["electron", "shared", "vite.config.ts"]
+  "include": ["electron", "shared", "cli", "vite.config.ts"]
 }

@@ -4,6 +4,7 @@ node_modules/
 dist/
 dist-electron/
 dist-mockups/
+dist-cli/
 
 # Local
 *.log
