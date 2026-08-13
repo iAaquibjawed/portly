@@ -92,19 +92,28 @@ export function Row({
 
   const showProcess = !processIsRedundant(row.project, row.process)
   const secondary = [
+    // portless replaces ports with names; show the name, keep the port as the
+    // anchor, because the port is what an EADDRINUSE actually reports.
+    row.namedUrl ? row.namedUrl.replace(/^https?:\/\//, '') : null,
     showProcess ? row.process : null,
     // PID is the least useful token at rest: hover and tooltip only.
     hovered && !isPermission && !isStopped ? String(row.pid) : null,
     row.title,
   ].filter(Boolean) as string[]
 
+  const memory = row.memoryKb ? `${Math.round(row.memoryKb / 1024)} MB` : null
+
   const tooltip = [
     row.project,
-    `port ${row.port}`,
+    row.namedUrl ? `${row.namedUrl}  ->  port ${row.port}` : `port ${row.port}`,
     isStopped ? 'stopped by Portly' : `${row.process} · pid ${row.pid}`,
     row.title,
     row.command,
     row.cwd,
+    // Stopping is irreversible for the user's work, so say what it costs and how.
+    isStopped ? null : `${row.risk.label} — ${row.risk.detail}`,
+    isStopped ? null : 'Stop sends SIGTERM first; SIGKILL only if it ignores that.',
+    memory ? `memory: ${memory}` : null,
     row.startCommand ? `start: ${row.startCommand}  (${row.startCommandSource})` : null,
     row.startError ? `start failed — ${row.startError}` : null,
   ]
@@ -224,11 +233,17 @@ export function Row({
           /* Reads with project and port — what the user needs to confirm they
              are killing the right thing. Destructive action first. */
           <div className="inline-row">
-            <span className="confirm-label">
-              Stop {row.project} on {row.port}?
+            {/* The project name absorbs any truncation; the port never does,
+                because the port is what the user is verifying. */}
+            <span className="confirm-label">Stop {row.project}</span>
+            <span className="confirm-port">on {row.port}?</span>
+            {/* Says what this costs. A database and a Vite server must not look
+                identical at the moment of confirming. */}
+            <span className="risk-chip" data-level={row.risk.level} title={row.risk.detail}>
+              {row.risk.label}
             </span>
             <button type="button" className="link" data-tone="danger" onClick={onConfirmKill}>
-              Stop
+              {row.risk.level === 'danger' ? 'Stop anyway' : 'Stop'}
             </button>
             <button type="button" className="link" onClick={onCancelKill}>
               Cancel

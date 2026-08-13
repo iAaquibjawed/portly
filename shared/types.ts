@@ -8,6 +8,17 @@ export type Variant = 'normal' | 'nonhttp' | 'permission'
 /** A stopped row keeps its place in the list until its restart window expires. */
 export type RowState = 'live' | 'stopped'
 
+/** How costly stopping a listener would be. */
+export type RiskLevel = 'safe' | 'caution' | 'danger'
+
+export interface StopRisk {
+  level: RiskLevel
+  /** Short chip text for the confirm line. */
+  label: string
+  /** Longer sentence for the tooltip. */
+  detail: string
+}
+
 export interface PortRow {
   /** Stable identity for reconciliation: port + pid, never list index. */
   id: string
@@ -42,6 +53,15 @@ export interface PortRow {
   startCommand: string | null
   /** `argv` read from the live process, or the file a command was inferred from. */
   startCommandSource: string | null
+  /** What stopping this would cost — shown in the confirm. */
+  risk: StopRisk
+  /** Resident memory in KB, or null when ps did not report it. */
+  memoryKb: number | null
+  /**
+   * A portless `.localhost` URL proxying to this port, when one is registered.
+   * Portly shows the name and opens it in preference to the raw port.
+   */
+  namedUrl: string | null
 }
 
 /** Everything the overflow menu needs, built in the main process. */

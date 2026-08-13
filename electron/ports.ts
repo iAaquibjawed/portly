@@ -5,6 +5,8 @@ import { isPortListening, parseLsofFields, readCwds, sh, wait } from './exec'
 import { resolveProjects, type ProjectInput } from './project'
 import { basename } from 'node:path'
 import { captureCommand, getCapture, getStartState, groupKeyFor } from './restart'
+import { assessStopRisk } from './risk'
+import { namedUrlFor, readPortlessRoutes } from './portless'
 import type { PortRow, Protocol, ScanResult, Variant } from '../shared/types'
 
 const CURRENT_USER = userInfo().username
@@ -95,6 +97,8 @@ interface ProcFacts {
   command: string | null
   /** Executable path from `comm`, which is never truncated. */
   comm: string | null
+  /** Resident set size in KB. */
+  rssKb: number | null
 }
 
 /**
@@ -108,16 +112,17 @@ async function readProcFacts(pids: number[]): Promise<Map<number, ProcFacts>> {
   if (!pids.length) return out
 
   const [argv, comm] = await Promise.all([
-    sh('ps', ['-o', 'pid=,etime=,command=', '-p', pids.join(',')]),
+    sh('ps', ['-o', 'pid=,etime=,rss=,command=', '-p', pids.join(',')]),
     sh('ps', ['-o', 'pid=,comm=', '-p', pids.join(',')]),
   ])
 
   for (const line of argv.stdout.split('\n')) {
-    const match = /^\s*(\d+)\s+(\S+)\s*(.*)$/.exec(line)
+    const match = /^\s*(\d+)\s+(\S+)\s+(\d+)\s*(.*)$/.exec(line)
     if (!match) continue
     out.set(Number.parseInt(match[1], 10), {
       uptimeSeconds: parseEtime(match[2]),
-      command: match[3].trim() || null,
+      rssKb: Number.parseInt(match[3], 10) || null,
+      command: match[4].trim() || null,
       comm: null,
     })
   }
@@ -364,14 +369,26 @@ export async function scan(showNonHttp: boolean): Promise<ScanResult> {
 
   const pids = [...new Set([...seen.values()].map((s) => s.pid))]
   const [cwds, procFacts] = await Promise.all([readCwds(pids), readProcFacts(pids)])
+  // Best-effort: absent or unfamiliar portless state simply yields no names.
+  const portlessRoutes = readPortlessRoutes()
 
   // Project names are resolved for the whole list at once, since uniqueness is
   // a property of the list.
-  // The fallback name comes from ps's `comm`, not lsof's command field, which
-  // truncates at ~31 characters and cuts names mid-word.
+  /**
+   * The display name comes from ps's `comm`, not lsof's command field, which
+   * truncates at ~31 characters and cuts names mid-word.
+   *
+   * `comm` is only a path for normal processes. A server that rewrote its
+   * process title reports the title here instead, and taking a basename of
+   * `puma 7.2.0 (tcp://0.0.0.0:3000) [backend]` yields the garbage
+   * `0.0.0.0:3000) [backend]`. So paths get a basename and anything else gets
+   * its leading token, which is the actual program name.
+   */
   const fallbackName = (pid: number, lsofCommand: string) => {
     const comm = procFacts.get(pid)?.comm
-    return comm ? basename(comm) || lsofCommand : lsofCommand
+    if (!comm) return lsofCommand
+    const name = comm.startsWith('/') ? basename(comm) : comm.trim().split(/\s+/)[0]
+    return name || lsofCommand
   }
 
   const projectInputs: ProjectInput[] = [...seen.entries()].map(([id, info]) => ({
@@ -418,6 +435,17 @@ export async function scan(showNonHttp: boolean): Promise<ScanResult> {
         startError: null,
         startCommand: null,
         startCommandSource: null,
+        memoryKb: procFacts.get(info.pid)?.rssKb ?? null,
+        namedUrl: namedUrlFor(portlessRoutes, info.port, info.pid),
+        risk: assessStopRisk({
+          process: displayProcess,
+          port: info.port,
+          protocol,
+          projectPath: unresolved ? null : (resolved?.path ?? null),
+          uptimeSeconds: procFacts.get(info.pid)?.uptimeSeconds ?? 0,
+          cwd,
+          variant,
+        }),
         protocol,
         title,
         uptimeSeconds: procFacts.get(info.pid)?.uptimeSeconds ?? 0,

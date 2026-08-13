@@ -28,6 +28,10 @@ function row(partial: Partial<PortRow> & Pick<PortRow, 'port' | 'pid' | 'project
     startError: null,
     startCommand: null,
     startCommandSource: null,
+    memoryKb: 148 * 1024,
+    namedUrl: null,
+    risk: { level: 'safe', label: 'dev server', detail: 'Serves HTTP from a project directory under a development runtime. Safe to stop.' },
+
     protocol: 'http',
     title: null,
     uptimeSeconds: 600,
