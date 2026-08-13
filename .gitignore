@@ -1,0 +1,14 @@
+node_modules/
+
+# Build output
+dist/
+dist-electron/
+dist-mockups/
+
+# Local
+*.log
+.DS_Store
+.claude/settings.local.json
+
+# Source archive of the design canvases; design/ holds the extracted files
+*.zip

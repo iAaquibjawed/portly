@@ -1,0 +1,33 @@
+{
+  "name": "portly",
+  "productName": "Portly",
+  "version": "1.0.0",
+  "description": "Menu-bar utility for the ports you are actually listening on",
+  "private": true,
+  "type": "module",
+  "main": "dist-electron/main.cjs",
+  "scripts": {
+    "icons": "esbuild scripts/icons.ts --bundle --platform=node --format=cjs --external:electron --outfile=dist-electron/icons.cjs --log-level=error && electron dist-electron/icons.cjs",
+    "fix:electron": "node scripts/fix-electron.mjs",
+    "build:electron": "node scripts/build-electron.mjs",
+    "build:renderer": "vite build",
+    "build": "npm run build:electron && npm run build:renderer",
+    "dev": "node scripts/dev.mjs",
+    "mockup": "vite build --config vite.mockups.config.ts && electron scripts/capture.cjs",
+    "start": "npm run build && electron .",
+    "typecheck": "tsc --noEmit -p tsconfig.json && tsc --noEmit -p tsconfig.node.json",
+    "tray:compare": "vite build --config vite.mockups.config.ts && electron scripts/capture.cjs --page=traycompare.html --out=tray-candidates.png --scale=2 --measure=none",
+    "hero": "vite build --config vite.mockups.config.ts && electron scripts/capture.cjs --page=hero.html --out=hero.png --scale=2 --measure=none"
+  },
+  "devDependencies": {
+    "@types/react": "^19.0.7",
+    "@types/react-dom": "^19.0.3",
+    "@vitejs/plugin-react": "^4.3.4",
+    "electron": "^43.4.0",
+    "esbuild": "^0.24.2",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "typescript": "^5.7.3",
+    "vite": "^6.0.7"
+  }
+}
