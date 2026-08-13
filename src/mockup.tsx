@@ -25,6 +25,10 @@ function row(p: Partial<PortRow> & Pick<PortRow, 'port' | 'pid' | 'project'>): P
     startError: null,
     startCommand: null,
     startCommandSource: null,
+    memoryKb: 148 * 1024,
+    namedUrl: null,
+    risk: { level: 'safe', label: 'dev server', detail: 'Serves HTTP from a project directory under a development runtime. Safe to stop.' },
+
     protocol: 'http',
     title: null,
     uptimeSeconds: 600,
@@ -74,6 +78,17 @@ const WITH_STOPPED: PortRow[] = LIST.map((r) => {
   return r
 })
 
+/** A datastore row, to show the escalated confirm. */
+const DANGER_LIST: PortRow[] = [
+  row({
+    port: 5432, pid: 63397, project: 'postgresql@18', process: 'postgres',
+    protocol: 'nonhttp', variant: 'nonhttp', uptimeSeconds: 2673625,
+    cwd: '/opt/homebrew/var/postgresql@18',
+    risk: { level: 'danger', label: 'database', detail: 'This looks like a datastore. Stopping it can lose writes that have not been flushed to disk.' },
+  }),
+  ...LIST.slice(3),
+]
+
 interface PanelSpec {
   key: string
   label: string
@@ -113,11 +128,21 @@ const PANELS: PanelSpec[] = [
   },
   {
     key: 'confirm',
-    label: '(d) Stop confirm',
-    note: 'Reads with project and port, not PID. Destructive action first, Cancel second. Esc cancels. The row does not change height.',
+    label: '(d) Stop confirm — safe',
+    note: 'Reads with project and port, not PID. A chip says what stopping costs: this one is a dev server. Destructive action first, Cancel second, Esc cancels, and the row does not change height.',
     rows: LIST,
     total: 39,
     confirmRow: 3,
+  },
+  {
+    key: 'confirm-danger',
+    label: '(e) Stop confirm — database',
+    note: 'The same control, escalated. A datastore is chipped in the warm colour and the verb becomes “Stop anyway”, because stopping Postgres and stopping Vite must not look identical at the moment you commit to it.',
+    rows: DANGER_LIST,
+    total: 39,
+    showNonHttp: true,
+    // Groups sort by freshest uptime, so the 30-day postgres row lands last.
+    confirmRow: 2,
   },
   {
     key: 'nonhttp',

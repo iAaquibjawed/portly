@@ -556,6 +556,31 @@
   color: var(--danger);
 }
 
+/* Risk chip — only ever appears inside the confirm. */
+
+.risk-chip {
+  flex-shrink: 0;
+  font-size: 10px;
+  line-height: 14px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  padding: 0 5px;
+  border-radius: var(--r-chip);
+  white-space: nowrap;
+  color: var(--text-secondary);
+  background: var(--chip-bg);
+}
+
+.risk-chip[data-level='safe'] {
+  color: var(--accent);
+  background: color-mix(in oklch, var(--accent) 14%, transparent);
+}
+
+.risk-chip[data-level='danger'] {
+  color: var(--danger);
+  background: var(--danger-bg);
+}
+
 /* Inline confirm ------------------------------------------------ */
 
 .inline-row {
@@ -571,9 +596,21 @@
 .confirm-label {
   color: var(--danger);
   font-weight: 600;
+  /* Shrinks first, and ellipsizes rather than clipping. */
+  flex: 1;
+  min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+/* Never shrinks: the port is the fact being confirmed. */
+.confirm-port {
+  flex-shrink: 0;
+  color: var(--danger);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  margin-left: -4px;
 }
 
 .link {
