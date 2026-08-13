@@ -1,0 +1,201 @@
+/* Comparison sheet chrome only. Never shipped. */
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 26px;
+  width: max-content;
+  background: oklch(93% 0.004 250);
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', sans-serif;
+  color: oklch(22% 0.008 250);
+}
+
+.sheet {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+/* Menu-bar strips ------------------------------------------------------- */
+
+.menubar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  height: 24px;
+  padding: 0 10px;
+  border-radius: 5px;
+}
+
+/* Template mask filled black, as macOS does on a light bar. */
+.menubar[data-context='light'] {
+  background: #f4f4f6;
+  border: 1px solid oklch(87% 0.004 250);
+  color: #000;
+}
+
+/* Inverted white on a dark bar. */
+.menubar[data-context='dark'] {
+  background: #232326;
+  border: 1px solid #34343a;
+  color: #fff;
+}
+
+/* Highlighted while the menu is open: system accent, white glyph. */
+.menubar[data-context='tint'] {
+  background: #0a63f0;
+  border: 1px solid #0a55cc;
+  color: #fff;
+}
+
+.slot {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.slot--subject {
+  position: relative;
+}
+
+/* Marks the candidate in the neighbour strip without tinting the glyph. */
+.slot--subject::after {
+  content: '';
+  position: absolute;
+  left: -5px;
+  right: -5px;
+  top: -3px;
+  bottom: -3px;
+  border: 1px dashed currentColor;
+  border-radius: 4px;
+  opacity: 0.45;
+}
+
+.divider {
+  width: 1px;
+  align-self: stretch;
+  margin: 4px 2px;
+  background: currentColor;
+  opacity: 0.22;
+}
+
+/* Rows ----------------------------------------------------------------- */
+
+.row {
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+  background: #fff;
+  border: 1px solid oklch(88% 0.005 250);
+  border-radius: 10px;
+  padding: 16px 18px;
+}
+
+.row-head {
+  width: 176px;
+  flex-shrink: 0;
+}
+
+.row-title {
+  font-size: 13.5px;
+  font-weight: 600;
+  margin-bottom: 3px;
+}
+
+.row-intent {
+  font-size: 11px;
+  line-height: 1.45;
+  color: oklch(50% 0.007 250);
+  margin-bottom: 12px;
+}
+
+.zoom {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.zoom-glyph {
+  width: 96px;
+  height: 96px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: oklch(97% 0.003 250);
+  border: 1px solid oklch(91% 0.004 250);
+  border-radius: 8px;
+  color: #000;
+}
+
+.zoom-caption,
+.cell-caption {
+  font-size: 9.5px;
+  letter-spacing: 0.03em;
+  color: oklch(60% 0.006 250);
+}
+
+.row-cells {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  flex-wrap: wrap;
+}
+
+.cell {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.cell--wide {
+  gap: 5px;
+}
+
+.cell-label {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: oklch(52% 0.007 250);
+}
+
+/* Problem statement ---------------------------------------------------- */
+
+.problem {
+  background: #fff;
+  border: 1px solid oklch(85% 0.03 25);
+  border-radius: 10px;
+  padding: 16px 18px;
+}
+
+.problem-label {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: oklch(52% 0.19 25);
+  margin-bottom: 10px;
+}
+
+.problem-body {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.problem-note {
+  font-size: 11.5px;
+  line-height: 1.5;
+  color: oklch(42% 0.007 250);
+  max-width: 620px;
+}
+
+.zoom-glyph--sm {
+  width: 64px;
+  height: 64px;
+  flex-shrink: 0;
+}

@@ -1,0 +1,24 @@
+/* README hero only. Never shipped. */
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 32px;
+  width: max-content;
+  /* A mid neutral so the card reads on both GitHub light and dark. */
+  background: oklch(92% 0.004 250);
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', sans-serif;
+}
+
+.hero {
+  display: flex;
+  gap: 32px;
+  align-items: flex-start;
+}
+
+.hero-pane {
+  flex-shrink: 0;
+}

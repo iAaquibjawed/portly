@@ -1,0 +1,61 @@
+/* Presentation chrome for the captured mockup sheet only. Never shipped. */
+
+body {
+  padding: 24px;
+  background: oklch(88% 0.004 250);
+  overflow: auto;
+  width: max-content;
+}
+
+.sheet {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.band {
+  padding: 22px 24px 24px;
+  border-radius: 12px;
+}
+
+.band[data-band='light'] {
+  background: oklch(97% 0.003 250);
+}
+
+.band[data-band='dark'] {
+  background: oklch(13.5% 0.006 250);
+}
+
+.band-title {
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+  margin-bottom: 16px;
+}
+
+.band-panels {
+  display: flex;
+  gap: 24px;
+  align-items: flex-start;
+}
+
+.panel {
+  width: 400px;
+  flex-shrink: 0;
+}
+
+.panel-label {
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: 10px;
+}
+
+.panel-note {
+  margin-top: 12px;
+  font-size: 11.5px;
+  line-height: 1.55;
+  color: var(--text-tertiary);
+}
