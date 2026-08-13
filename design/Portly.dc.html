@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+  body { margin: 0; box-sizing: border-box; }
+  * { box-sizing: border-box; }
+  a { color: oklch(52% 0.14 145); }
+  a:hover { color: oklch(46% 0.15 145); }
+  @keyframes portly-spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+  @keyframes portly-pulse { 0%, 100% { opacity: 0.5; } 50% { opacity: 0.9; } }
+</style>
+</helmet>
+
+<div style="font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Segoe UI',sans-serif;background:oklch(97% 0.003 250);min-height:100vh;padding:56px 40px 120px;color:oklch(18% 0.008 250);">
+  <div style="max-width:1360px;margin:0 auto;">
+
+    <div style="max-width:760px;margin-bottom:64px;">
+      <div style="font-size:11px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:oklch(52% 0.14 145);margin-bottom:10px;">Popover design spec</div>
+      <h1 style="font-size:34px;font-weight:700;letter-spacing:-0.01em;margin:0 0 18px;">Portly — menu-bar popover</h1>
+      <p style="font-size:15px;line-height:1.65;color:oklch(38% 0.007 250);margin:0;">Portly rejects the dark-dashboard default most dev tools reach for. A menu-bar popover isn't a dashboard — it's a glance. The interface borrows from macOS's own system UI: popover chrome, SF Pro, 4px geometry, and restraint. Nothing here is decorative: no gradients, no glass, no color used as costume. One accent, a grass green pulled from terminal "listening" conventions, appears only on focus rings and the active count, never as branding. Status reads through shape — filled dot, ringed dot, outline square, dashed ring — not hue alone, so it survives grayscale and colorblindness. Rows run tight, two lines each, with tabular numerals locking every port and uptime into a column a developer can scan without reading. Destructive actions stay invisible until hover, so the resting list stays calm. The result should feel less like a product and more like a well-labeled utility drawer — something Apple could have shipped, if Apple shipped ports.</p>
+    </div>
+
+    <div style="margin-bottom:72px;">
+      <h2 style="font-size:13px;font-weight:600;letter-spacing:0.04em;text-transform:uppercase;color:oklch(48% 0.007 250);margin:0 0 20px;">Design tokens</h2>
+      <div style="display:grid;grid-template-columns:1.1fr 1fr;gap:32px;">
+
+        <div style="background:#fff;border:1px solid oklch(90% 0.005 250);border-radius:8px;padding:20px 24px;">
+          <div style="font-size:12px;font-weight:600;color:oklch(48% 0.007 250);margin-bottom:12px;">Type scale — system stack, tabular numerals on numeric fields</div>
+          <table style="width:100%;border-collapse:collapse;font-size:12.5px;">
+            <tbody>
+              <tr style="border-top:1px solid oklch(93% 0.004 250);"><td style="padding:7px 0;color:oklch(48% 0.007 250);">Project name</td><td style="padding:7px 0;text-align:right;font-weight:600;">13.5px / 18 · Semibold</td></tr>
+              <tr style="border-top:1px solid oklch(93% 0.004 250);"><td style="padding:7px 0;color:oklch(48% 0.007 250);">Port</td><td style="padding:7px 0;text-align:right;font-weight:600;font-variant-numeric:tabular-nums;">13px / 18 · Semibold · tabular</td></tr>
+              <tr style="border-top:1px solid oklch(93% 0.004 250);"><td style="padding:7px 0;color:oklch(48% 0.007 250);">Process · title</td><td style="padding:7px 0;text-align:right;">11.5px / 16 · Regular</td></tr>
+              <tr style="border-top:1px solid oklch(93% 0.004 250);"><td style="padding:7px 0;color:oklch(48% 0.007 250);">Uptime</td><td style="padding:7px 0;text-align:right;font-variant-numeric:tabular-nums;">11px / 14 · Regular · tabular</td></tr>
+              <tr style="border-top:1px solid oklch(93% 0.004 250);"><td style="padding:7px 0;color:oklch(48% 0.007 250);">Search field</td><td style="padding:7px 0;text-align:right;">13px / 18 · Regular</td></tr>
+              <tr style="border-top:1px solid oklch(93% 0.004 250);"><td style="padding:7px 0;color:oklch(48% 0.007 250);">Section label</td><td style="padding:7px 0;text-align:right;">10.5px / 14 · Semibold · uppercase</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div style="background:#fff;border:1px solid oklch(90% 0.005 250);border-radius:8px;padding:20px 24px;">
+          <div style="font-size:12px;font-weight:600;color:oklch(48% 0.007 250);margin-bottom:12px;">Spacing (4px base) &amp; radii</div>
+          <div style="display:flex;gap:8px;align-items:flex-end;margin-bottom:14px;">
+            <sc-for list="{{ spacingScale }}" as="s" hint-placeholder-count="7">
+              <div style="text-align:center;">
+                <div style="background:oklch(52% 0.14 145);width:20px;height:{{ s.h }}px;border-radius:2px;margin:0 auto 4px;"></div>
+                <div style="font-size:10px;color:oklch(52% 0.007 250);">{{ s.v }}</div>
+              </div>
+            </sc-for>
+          </div>
+          <div style="display:flex;gap:16px;">
+            <div style="text-align:center;"><div style="width:40px;height:40px;background:oklch(93% 0.004 250);border-radius:4px;margin-bottom:4px;"></div><div style="font-size:10px;color:oklch(52% 0.007 250);">4px · chips</div></div>
+            <div style="text-align:center;"><div style="width:40px;height:40px;background:oklch(93% 0.004 250);border-radius:6px;margin-bottom:4px;"></div><div style="font-size:10px;color:oklch(52% 0.007 250);">6px · fields</div></div>
+            <div style="text-align:center;"><div style="width:40px;height:40px;background:oklch(93% 0.004 250);border-radius:8px;margin-bottom:4px;"></div><div style="font-size:10px;color:oklch(52% 0.007 250);">8px · popover</div></div>
+          </div>
+        </div>
+
+        <div style="background:#fff;border:1px solid oklch(90% 0.005 250);border-radius:8px;padding:20px 24px;grid-column:1/2;">
+          <div style="font-size:12px;font-weight:600;color:oklch(48% 0.007 250);margin-bottom:12px;">Neutral ramp — light</div>
+          <div style="display:flex;">
+            <sc-for list="{{ lightRamp }}" as="c" hint-placeholder-count="8">
+              <div style="flex:1;">
+                <div style="height:36px;background:{{ c.hex }};border:1px solid oklch(90% 0.005 250);"></div>
+                <div style="font-size:8.5px;color:oklch(52% 0.007 250);padding:3px 2px;">{{ c.label }}</div>
+              </div>
+            </sc-for>
+          </div>
+          <div style="font-size:12px;font-weight:600;color:oklch(48% 0.007 250);margin:16px 0 12px;">Neutral ramp — dark</div>
+          <div style="display:flex;">
+            <sc-for list="{{ darkRamp }}" as="c" hint-placeholder-count="8">
+              <div style="flex:1;">
+                <div style="height:36px;background:{{ c.hex }};border:1px solid oklch(30% 0.008 250);"></div>
+                <div style="font-size:8.5px;color:oklch(52% 0.007 250);padding:3px 2px;">{{ c.label }}</div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+
+        <div style="background:#fff;border:1px solid oklch(90% 0.005 250);border-radius:8px;padding:20px 24px;">
+          <div style="font-size:12px;font-weight:600;color:oklch(48% 0.007 250);margin-bottom:12px;">Accent — one hue, grass green</div>
+          <div style="display:flex;gap:12px;">
+            <div style="flex:1;"><div style="height:48px;background:oklch(52% 0.14 145);border-radius:6px;margin-bottom:6px;"></div><div style="font-size:10.5px;color:oklch(48% 0.007 250);">Light · oklch(52% 0.14 145)</div></div>
+            <div style="flex:1;"><div style="height:48px;background:oklch(72% 0.15 145);border-radius:6px;margin-bottom:6px;"></div><div style="font-size:10.5px;color:oklch(48% 0.007 250);">Dark · oklch(72% 0.15 145)</div></div>
+          </div>
+          <p style="font-size:11.5px;line-height:1.5;color:oklch(52% 0.007 250);margin:14px 0 0;">Used only for the focus ring and the active-count number. Never used for protocol or liveness signal — those are shape-coded so meaning survives grayscale.</p>
+        </div>
+
+      </div>
+    </div>
+
+    <div style="margin-bottom:72px;">
+      <h2 style="font-size:13px;font-weight:600;letter-spacing:0.04em;text-transform:uppercase;color:oklch(48% 0.007 250);margin:0 0 20px;">Row anatomy</h2>
+      <div style="display:flex;gap:40px;align-items:flex-start;flex-wrap:wrap;">
+        <div style="width:400px;background:#fff;border:1px solid oklch(88% 0.005 250);border-radius:8px;box-shadow:0 8px 24px rgba(0,0,0,0.10);position:relative;padding:34px 0 40px;">
+          <dc-import name="Row" hint-size="400,60" theme="light" port="5173" project="my-shop-frontend" process="node" pid="41213" protocol="http" title="Vite + React" uptime="2h 14m" variant="normal"></dc-import>
+          <div style="position:absolute;left:18px;top:8px;width:16px;height:16px;border:1px solid oklch(52% 0.14 145);border-radius:50%;color:oklch(52% 0.14 145);font-size:9px;font-weight:700;display:flex;align-items:center;justify-content:center;background:#fff;z-index:2;">1</div>
+          <div style="position:absolute;left:18px;top:24px;width:1px;height:10px;background:oklch(52% 0.14 145);"></div>
+          <div style="position:absolute;left:96px;top:8px;width:16px;height:16px;border:1px solid oklch(52% 0.14 145);border-radius:50%;color:oklch(52% 0.14 145);font-size:9px;font-weight:700;display:flex;align-items:center;justify-content:center;background:#fff;z-index:2;">2</div>
+          <div style="position:absolute;left:104px;top:24px;width:1px;height:10px;background:oklch(52% 0.14 145);"></div>
+          <div style="position:absolute;right:20px;top:8px;width:16px;height:16px;border:1px solid oklch(52% 0.14 145);border-radius:50%;color:oklch(52% 0.14 145);font-size:9px;font-weight:700;display:flex;align-items:center;justify-content:center;background:#fff;z-index:2;">3</div>
+          <div style="position:absolute;right:26px;top:24px;width:1px;height:10px;background:oklch(52% 0.14 145);"></div>
+          <div style="position:absolute;left:96px;bottom:8px;width:16px;height:16px;border:1px solid oklch(52% 0.14 145);border-radius:50%;color:oklch(52% 0.14 145);font-size:9px;font-weight:700;display:flex;align-items:center;justify-content:center;background:#fff;z-index:2;">4</div>
+          <div style="position:absolute;left:104px;bottom:24px;width:1px;height:10px;background:oklch(52% 0.14 145);"></div>
+          <div style="position:absolute;right:26px;bottom:8px;width:16px;height:16px;border:1px solid oklch(52% 0.14 145);border-radius:50%;color:oklch(52% 0.14 145);font-size:9px;font-weight:700;display:flex;align-items:center;justify-content:center;background:#fff;z-index:2;">5</div>
+          <div style="position:absolute;right:20px;bottom:24px;width:1px;height:10px;background:oklch(52% 0.14 145);"></div>
+        </div>
+        <div style="flex:1;min-width:280px;max-width:520px;">
+          <div style="display:flex;gap:10px;margin-bottom:14px;"><div style="width:16px;height:16px;border-radius:50%;background:oklch(52% 0.14 145);color:#fff;font-size:9px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;">1</div><div style="font-size:13px;line-height:1.5;"><strong>Signal glyph</strong> — shape encodes protocol, not color. Always same 16px slot, left edge.</div></div>
+          <div style="display:flex;gap:10px;margin-bottom:14px;"><div style="width:16px;height:16px;border-radius:50%;background:oklch(52% 0.14 145);color:#fff;font-size:9px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;">2</div><div style="font-size:13px;line-height:1.5;"><strong>Project name</strong> — primary hierarchy. Semibold, truncates before anything else gives way.</div></div>
+          <div style="display:flex;gap:10px;margin-bottom:14px;"><div style="width:16px;height:16px;border-radius:50%;background:oklch(52% 0.14 145);color:#fff;font-size:9px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;">3</div><div style="font-size:13px;line-height:1.5;"><strong>Port</strong> — the scannable anchor. Fixed-width tabular column, right-aligned, identical position on every row — this is what a 400ms glance locks onto.</div></div>
+          <div style="display:flex;gap:10px;margin-bottom:14px;"><div style="width:16px;height:16px;border-radius:50%;background:oklch(52% 0.14 145);color:#fff;font-size:9px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;">4</div><div style="font-size:13px;line-height:1.5;"><strong>Process, PID, page title</strong> — tertiary metadata, one truncating line under the project name.</div></div>
+          <div style="display:flex;gap:10px;margin-bottom:20px;"><div style="width:16px;height:16px;border-radius:50%;background:oklch(52% 0.14 145);color:#fff;font-size:9px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;">5</div><div style="font-size:13px;line-height:1.5;"><strong>Uptime</strong> — resting state, same column as the actions that replace it on hover.</div></div>
+          <div style="border-top:1px solid oklch(88% 0.005 250);padding-top:16px;font-size:13px;line-height:1.6;color:oklch(38% 0.007 250);">
+            <strong style="color:oklch(18% 0.008 250);">States.</strong> Resting: no border, no shadow, uptime visible. Hover: row tints one step, uptime is replaced by Open / More / Kill — the only moment destructive action exists on screen. Focus (keyboard nav): 1.5px accent ring inset, no fill change. Active click: icon background darkens one more step, no scale/bounce. Try hovering row 1 in the mockups below.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-bottom:24px;display:flex;align-items:baseline;justify-content:space-between;">
+      <h2 style="font-size:13px;font-weight:600;letter-spacing:0.04em;text-transform:uppercase;color:oklch(48% 0.007 250);margin:0;">Popover — true size, light &amp; dark</h2>
+      <div style="font-size:11.5px;color:oklch(52% 0.007 250);">Interactive — click a state, hover a row, try Kill</div>
+    </div>
+    <div style="display:flex;gap:8px;margin-bottom:28px;flex-wrap:wrap;">
+      <sc-for list="{{ tabs }}" as="tabItem" hint-placeholder-count="5">
+        <button onClick="{{ tabItem.onClick }}" style="{{ tabItem.style }}" style-hover="{{ tabHoverStyle }}">{{ tabItem.label }}</button>
+      </sc-for>
+    </div>
+
+    <div style="display:flex;gap:40px;flex-wrap:wrap;margin-bottom:72px;">
+
+      <div>
+        <div style="font-size:11px;font-weight:600;color:oklch(52% 0.007 250);margin-bottom:10px;text-transform:uppercase;letter-spacing:0.04em;">Light</div>
+        <div style="width:400px;max-height:520px;background:#fff;border:1px solid oklch(88% 0.005 250);border-radius:8px;box-shadow:0 8px 24px rgba(0,0,0,0.12);display:flex;flex-direction:column;overflow:hidden;">
+
+          <div style="display:flex;align-items:center;gap:8px;padding:10px 12px;border-bottom:1px solid oklch(90% 0.005 250);flex-shrink:0;">
+            <div style="position:relative;width:12px;height:12px;flex-shrink:0;margin-left:2px;">
+              <div style="width:8px;height:8px;border:1.3px solid oklch(62% 0.006 250);border-radius:50%;"></div>
+              <div style="position:absolute;width:4px;height:1.3px;background:oklch(62% 0.006 250);transform:rotate(45deg);bottom:-1px;right:-2px;"></div>
+            </div>
+            <input placeholder="Search project, port, process…" style="flex:1;border:none;outline:none;background:transparent;font-size:13px;color:oklch(18% 0.008 250);font-family:inherit;" />
+            <div style="font-size:11px;color:oklch(58% 0.007 250);background:oklch(92% 0.004 250);border-radius:4px;padding:2px 5px;flex-shrink:0;">⌘K</div>
+            <div style="font-size:14px;color:oklch(62% 0.006 250);flex-shrink:0;animation:{{ spinAnim }};">↻</div>
+          </div>
+
+          <div style="overflow-y:auto;">
+            <sc-if value="{{ isEmpty }}" hint-placeholder-val="{{ false }}">
+              <div style="padding:56px 24px;text-align:center;">
+                <div style="width:9px;height:9px;border-radius:50%;border:1.5px dashed oklch(62% 0.006 250);margin:0 auto 16px;"></div>
+                <div style="font-size:13.5px;font-weight:600;color:oklch(18% 0.008 250);margin-bottom:6px;">Nothing listening</div>
+                <div style="font-size:12px;color:oklch(62% 0.006 250);line-height:1.5;">Start a dev server and it will show up here.</div>
+              </div>
+            </sc-if>
+            <sc-if value="{{ isLoading }}" hint-placeholder-val="{{ false }}">
+              <div style="padding:8px 14px;">
+                <sc-for list="{{ skeletons }}" as="sk" hint-placeholder-count="3">
+                  <div style="display:flex;align-items:center;gap:10px;padding:11px 0;">
+                    <div style="width:16px;height:16px;border-radius:50%;background:oklch(90% 0.005 250);animation:portly-pulse 1.2s ease-in-out infinite;animation-delay:{{ sk.delay }};"></div>
+                    <div style="flex:1;">
+                      <div style="height:10px;width:55%;background:oklch(90% 0.005 250);border-radius:2px;margin-bottom:6px;animation:portly-pulse 1.2s ease-in-out infinite;animation-delay:{{ sk.delay }};"></div>
+                      <div style="height:8px;width:35%;background:oklch(90% 0.005 250);border-radius:2px;animation:portly-pulse 1.2s ease-in-out infinite;animation-delay:{{ sk.delay }};"></div>
+                    </div>
+                  </div>
+                </sc-for>
+              </div>
+            </sc-if>
+            <sc-if value="{{ isNormal }}" hint-placeholder-val="{{ true }}">
+              <sc-if value="{{ isPermissionTab }}" hint-placeholder-val="{{ false }}">
+                <div style="padding:8px 14px;font-size:11.5px;color:oklch(62% 0.006 250);background:oklch(97% 0.003 250);border-bottom:1px solid oklch(90% 0.005 250);">Some processes need permission to identify their owner.</div>
+              </sc-if>
+              <sc-for list="{{ liveRows }}" as="row" hint-placeholder-count="4">
+                <dc-import name="Row" hint-size="360,56" theme="light" port="{{ row.port }}" project="{{ row.project }}" process="{{ row.process }}" pid="{{ row.pid }}" protocol="{{ row.protocol }}" title="{{ row.title }}" uptime="{{ row.uptime }}" variant="{{ row.variant }}" killConfirm="{{ row.killConfirm }}" moreOpen="{{ row.moreOpen }}" removing="{{ row.removing }}" onOpen="{{ row.onOpen }}" onCopy="{{ row.onCopy }}" onReveal="{{ row.onReveal }}" onToggleMore="{{ row.onToggleMore }}" onKill="{{ row.onKill }}" onCancelKill="{{ row.onCancelKill }}" onConfirmKill="{{ row.onConfirmKill }}"></dc-import>
+              </sc-for>
+              <sc-if value="{{ hasHistory }}" hint-placeholder-val="{{ false }}">
+                <div style="font-size:10px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:oklch(62% 0.006 250);padding:10px 14px 4px;">Recently freed</div>
+                <sc-for list="{{ historyRows }}" as="hrow" hint-placeholder-count="2">
+                  <dc-import name="Row" hint-size="360,24" theme="light" port="{{ hrow.port }}" project="{{ hrow.project }}" uptime="{{ hrow.uptime }}" variant="history"></dc-import>
+                </sc-for>
+              </sc-if>
+            </sc-if>
+          </div>
+
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:9px 14px;border-top:1px solid oklch(90% 0.005 250);flex-shrink:0;font-size:11.5px;">
+            <div style="color:oklch(62% 0.006 250);font-variant-numeric:tabular-nums;">{{ footerCountText }}</div>
+            <div style="display:flex;gap:12px;">
+              <span style="color:oklch(62% 0.006 250);">Settings</span>
+              <span style="color:oklch(62% 0.006 250);">Quit</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <div>
+        <div style="font-size:11px;font-weight:600;color:oklch(52% 0.007 250);margin-bottom:10px;text-transform:uppercase;letter-spacing:0.04em;">Dark</div>
+        <div style="width:400px;max-height:520px;background:oklch(19% 0.006 250);border:1px solid oklch(27% 0.007 250);border-radius:8px;box-shadow:0 8px 24px rgba(0,0,0,0.45);display:flex;flex-direction:column;overflow:hidden;">
+
+          <div style="display:flex;align-items:center;gap:8px;padding:10px 12px;border-bottom:1px solid oklch(27% 0.007 250);flex-shrink:0;">
+            <div style="position:relative;width:12px;height:12px;flex-shrink:0;margin-left:2px;">
+              <div style="width:8px;height:8px;border:1.3px solid oklch(52% 0.008 250);border-radius:50%;"></div>
+              <div style="position:absolute;width:4px;height:1.3px;background:oklch(52% 0.008 250);transform:rotate(45deg);bottom:-1px;right:-2px;"></div>
+            </div>
+            <input placeholder="Search project, port, process…" style="flex:1;border:none;outline:none;background:transparent;font-size:13px;color:oklch(94% 0.004 250);font-family:inherit;" />
+            <div style="font-size:11px;color:oklch(70% 0.006 250);background:oklch(28% 0.008 250);border-radius:4px;padding:2px 5px;flex-shrink:0;">⌘K</div>
+            <div style="font-size:14px;color:oklch(52% 0.008 250);flex-shrink:0;animation:{{ spinAnim }};">↻</div>
+          </div>
+
+          <div style="overflow-y:auto;">
+            <sc-if value="{{ isEmpty }}" hint-placeholder-val="{{ false }}">
+              <div style="padding:56px 24px;text-align:center;">
+                <div style="width:9px;height:9px;border-radius:50%;border:1.5px dashed oklch(52% 0.008 250);margin:0 auto 16px;"></div>
+                <div style="font-size:13.5px;font-weight:600;color:oklch(94% 0.004 250);margin-bottom:6px;">Nothing listening</div>
+                <div style="font-size:12px;color:oklch(52% 0.008 250);line-height:1.5;">Start a dev server and it will show up here.</div>
+              </div>
+            </sc-if>
+            <sc-if value="{{ isLoading }}" hint-placeholder-val="{{ false }}">
+              <div style="padding:8px 14px;">
+                <sc-for list="{{ skeletons }}" as="sk" hint-placeholder-count="3">
+                  <div style="display:flex;align-items:center;gap:10px;padding:11px 0;">
+                    <div style="width:16px;height:16px;border-radius:50%;background:oklch(27% 0.007 250);animation:portly-pulse 1.2s ease-in-out infinite;animation-delay:{{ sk.delay }};"></div>
+                    <div style="flex:1;">
+                      <div style="height:10px;width:55%;background:oklch(27% 0.007 250);border-radius:2px;margin-bottom:6px;animation:portly-pulse 1.2s ease-in-out infinite;animation-delay:{{ sk.delay }};"></div>
+                      <div style="height:8px;width:35%;background:oklch(27% 0.007 250);border-radius:2px;animation:portly-pulse 1.2s ease-in-out infinite;animation-delay:{{ sk.delay }};"></div>
+                    </div>
+                  </div>
+                </sc-for>
+              </div>
+            </sc-if>
+            <sc-if value="{{ isNormal }}" hint-placeholder-val="{{ true }}">
+              <sc-if value="{{ isPermissionTab }}" hint-placeholder-val="{{ false }}">
+                <div style="padding:8px 14px;font-size:11.5px;color:oklch(52% 0.008 250);background:oklch(24% 0.008 250);border-bottom:1px solid oklch(27% 0.007 250);">Some processes need permission to identify their owner.</div>
+              </sc-if>
+              <sc-for list="{{ liveRows }}" as="row" hint-placeholder-count="4">
+                <dc-import name="Row" hint-size="360,56" theme="dark" port="{{ row.port }}" project="{{ row.project }}" process="{{ row.process }}" pid="{{ row.pid }}" protocol="{{ row.protocol }}" title="{{ row.title }}" uptime="{{ row.uptime }}" variant="{{ row.variant }}" killConfirm="{{ row.killConfirm }}" moreOpen="{{ row.moreOpen }}" removing="{{ row.removing }}" onOpen="{{ row.onOpen }}" onCopy="{{ row.onCopy }}" onReveal="{{ row.onReveal }}" onToggleMore="{{ row.onToggleMore }}" onKill="{{ row.onKill }}" onCancelKill="{{ row.onCancelKill }}" onConfirmKill="{{ row.onConfirmKill }}"></dc-import>
+              </sc-for>
+              <sc-if value="{{ hasHistory }}" hint-placeholder-val="{{ false }}">
+                <div style="font-size:10px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:oklch(52% 0.008 250);padding:10px 14px 4px;">Recently freed</div>
+                <sc-for list="{{ historyRows }}" as="hrow" hint-placeholder-count="2">
+                  <dc-import name="Row" hint-size="360,24" theme="dark" port="{{ hrow.port }}" project="{{ hrow.project }}" uptime="{{ hrow.uptime }}" variant="history"></dc-import>
+                </sc-for>
+              </sc-if>
+            </sc-if>
+          </div>
+
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:9px 14px;border-top:1px solid oklch(27% 0.007 250);flex-shrink:0;font-size:11.5px;">
+            <div style="color:oklch(52% 0.008 250);font-variant-numeric:tabular-nums;">{{ footerCountText }}</div>
+            <div style="display:flex;gap:12px;">
+              <span style="color:oklch(52% 0.008 250);">Settings</span>
+              <span style="color:oklch(52% 0.008 250);">Quit</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:32px;margin-bottom:72px;">
+      <div>
+        <h2 style="font-size:13px;font-weight:600;letter-spacing:0.04em;text-transform:uppercase;color:oklch(48% 0.007 250);margin:0 0 16px;">Interaction spec</h2>
+        <div style="background:#fff;border:1px solid oklch(90% 0.005 250);border-radius:8px;padding:20px 24px;font-size:13px;line-height:1.7;color:oklch(30% 0.007 250);">
+          <p style="margin:0 0 12px;"><strong>Keyboard.</strong> ⌘K focuses search from anywhere. ↑↓ move the highlight (wraps at ends). ⏎ opens the highlighted row's URL (no-op if non-HTTP). ⌫ starts kill-confirm on the highlighted row; ⌫ again confirms, Esc cancels. Esc with search focused clears it first, then dismisses the popover.</p>
+          <p style="margin:0 0 12px;"><strong>Confirm vs. instant.</strong> Kill always confirms — it's destructive and irreversible. Open, copy URL, and reveal-in-Finder are instant — they're read-only.</p>
+          <p style="margin:0 0 12px;"><strong>Kill animation.</strong> Confirmed kill fades the row to 0 opacity while its max-height collapses to 0 over 220ms, then the row is removed and the list reflows — no layout jump before the collapse starts.</p>
+          <p style="margin:0;"><strong>Refresh without losing place.</strong> On rescan, rows are matched by port+PID, not index. Matched rows update in place; a row whose PID changed (process restarted) gets a brief 1px accent-colored underline for 2s instead of moving; only genuinely new or gone rows enter/exit the list. The keyboard highlight follows its row, not its position.</p>
+        </div>
+      </div>
+      <div>
+        <h2 style="font-size:13px;font-weight:600;letter-spacing:0.04em;text-transform:uppercase;color:oklch(48% 0.007 250);margin:0 0 16px;">Signal design — no legend, no color dependency</h2>
+        <div style="background:#fff;border:1px solid oklch(90% 0.005 250);border-radius:8px;padding:20px 24px;">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
+            <div style="display:flex;align-items:center;gap:10px;"><div style="width:8px;height:8px;border-radius:50%;background:oklch(30% 0.007 250);"></div><div style="font-size:12px;color:oklch(38% 0.007 250);">HTTP — filled dot</div></div>
+            <div style="display:flex;align-items:center;gap:10px;"><div style="position:relative;width:16px;height:16px;display:flex;align-items:center;justify-content:center;"><div style="width:8px;height:8px;border-radius:50%;background:oklch(30% 0.007 250);"></div><div style="position:absolute;width:14px;height:14px;border-radius:50%;border:1px solid oklch(30% 0.007 250);"></div></div><div style="font-size:12px;color:oklch(38% 0.007 250);">HTTPS — ringed dot</div></div>
+            <div style="display:flex;align-items:center;gap:10px;"><div style="width:8px;height:8px;border:1.5px solid oklch(30% 0.007 250);"></div><div style="font-size:12px;color:oklch(38% 0.007 250);">Non-HTTP — outline square</div></div>
+            <div style="display:flex;align-items:center;gap:10px;"><div style="width:9px;height:9px;border-radius:50%;border:1.5px dashed oklch(30% 0.007 250);"></div><div style="font-size:12px;color:oklch(38% 0.007 250);">Unresolved owner — dashed ring</div></div>
+          </div>
+          <p style="font-size:12.5px;line-height:1.6;color:oklch(48% 0.007 250);margin:0;">A killed listener drops its glyph entirely and gets a flat line instead — "ended" is a fourth, distinct shape, not a faded copy of "running." Every signal is rendered in the same ink color as body text; nothing here depends on hue. Screenshot this in grayscale and it still reads.</p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;initialTab&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;default&quot;:&quot;default&quot;,&quot;options&quot;:[&quot;default&quot;,&quot;empty&quot;,&quot;loading&quot;,&quot;permission&quot;,&quot;conflict&quot;],&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Behavior&quot;}}">
+const DEFAULT_ROWS = {
+  default: [
+    { id: 'd1', port: '5173', project: 'my-shop-frontend', process: 'node', pid: '41213', protocol: 'http', title: 'Vite + React', uptime: '2h 14m', variant: 'normal' },
+    { id: 'd2', port: '3000', project: 'my-shop-api', process: 'node', pid: '41198', protocol: 'http', title: 'Express', uptime: '2h 15m', variant: 'normal' },
+    { id: 'd3', port: '8000', project: 'internal-docs', process: 'python3', pid: '5521', protocol: 'http', title: 'Docs · MkDocs', uptime: '41m', variant: 'normal' },
+    { id: 'd4', port: '5432', project: 'my-shop-frontend', process: 'postgres', pid: '990', protocol: 'nonhttp', title: null, uptime: '6h 02m', variant: 'nonhttp' },
+    { id: 'd5', port: '6379', project: 'my-shop-api', process: 'redis-server', pid: '1042', protocol: 'nonhttp', title: null, uptime: '6h 02m', variant: 'nonhttp' },
+    { id: 'd6', port: '4321', project: 'notes-site', process: 'ruby', pid: '8834', protocol: 'https', title: 'Astro Notes', uptime: '12m', variant: 'normal' },
+  ],
+  permission: [
+    { id: 'p1', port: '5173', project: 'my-shop-frontend', process: 'node', pid: '41213', protocol: 'http', title: 'Vite + React', uptime: '2h 14m', variant: 'normal' },
+    { id: 'p2', port: '7000', project: '(unresolved)', process: 'unknown', pid: '—', protocol: 'unknown', title: null, uptime: '58m', variant: 'permission' },
+    { id: 'p3', port: '9229', project: '(unresolved)', process: 'unknown', pid: '—', protocol: 'unknown', title: null, uptime: '3h 40m', variant: 'permission' },
+  ],
+  conflict: [
+    { id: 'c1', port: '3001', project: 'my-shop-frontend', process: 'node', pid: '52310', protocol: 'http', title: 'Vite + React', uptime: '9m', variant: 'normal' },
+    { id: 'c2', port: '8000', project: 'internal-docs', process: 'python3', pid: '5521', protocol: 'http', title: 'Docs · MkDocs', uptime: '41m', variant: 'normal' },
+    { id: 'c3', port: '5173', project: 'my-shop-frontend', process: '', pid: '', protocol: '', title: null, uptime: '4m ago', variant: 'history' },
+    { id: 'c4', port: '3000', project: 'my-shop-api', process: '', pid: '', protocol: '', title: null, uptime: '18m ago', variant: 'history' },
+  ],
+  empty: [],
+  loading: [],
+};
+
+class Component extends DCLogic {
+  state = {
+    activeTab: this.props.initialTab || 'default',
+    rowsByTab: JSON.parse(JSON.stringify(DEFAULT_ROWS)),
+    ui: {},
+  };
+
+  setUi(id, patch) {
+    this.setState(s => ({ ui: { ...s.ui, [id]: { ...s.ui[id], ...patch } } }));
+  }
+
+  killRow(tab, id) {
+    this.setState(s => ({ rowsByTab: { ...s.rowsByTab, [tab]: s.rowsByTab[tab].filter(r => r.id !== id) } }));
+  }
+
+  renderVals() {
+    const tabDefs = [
+      { key: 'default', label: 'Default' },
+      { key: 'empty', label: 'Empty' },
+      { key: 'loading', label: 'Loading' },
+      { key: 'permission', label: 'Permission-denied' },
+      { key: 'conflict', label: 'Port conflict' },
+    ];
+    const active = this.state.activeTab;
+    const rows = (this.state.rowsByTab[active] || []).map(r => {
+      const ui = this.state.ui[r.id] || {};
+      return {
+        ...r,
+        killConfirm: !!ui.killConfirm,
+        moreOpen: !!ui.moreOpen,
+        removing: !!ui.removing,
+        onOpen: (e) => { e.preventDefault(); if (r.protocol === 'http' || r.protocol === 'https') window.open('http://localhost:' + r.port, '_blank'); },
+        onCopy: (e) => { e.preventDefault(); navigator.clipboard && navigator.clipboard.writeText('http://localhost:' + r.port); this.setUi(r.id, { moreOpen: false }); },
+        onReveal: (e) => { e.preventDefault(); this.setUi(r.id, { moreOpen: false }); },
+        onToggleMore: (e) => { e.preventDefault(); this.setUi(r.id, { moreOpen: !ui.moreOpen }); },
+        onKill: (e) => { e.preventDefault(); this.setUi(r.id, { killConfirm: true }); },
+        onCancelKill: (e) => { e.preventDefault(); this.setUi(r.id, { killConfirm: false }); },
+        onConfirmKill: (e) => {
+          e.preventDefault();
+          this.setUi(r.id, { removing: true, killConfirm: false });
+          setTimeout(() => this.killRow(active, r.id), 230);
+        },
+      };
+    });
+
+    const liveRows = rows.filter(r => r.variant !== 'history');
+    const historyRows = rows.filter(r => r.variant === 'history');
+    const activeCount = liveRows.length;
+    const isEmpty = active === 'empty';
+    const isLoading = active === 'loading';
+
+    return {
+      spacingScale: [4, 8, 12, 16, 20, 24, 32].map(v => ({ v, h: 6 + v })),
+      lightRamp: [
+        { hex: 'oklch(99% 0.002 250)', label: '99' }, { hex: 'oklch(97% 0.003 250)', label: '97' },
+        { hex: 'oklch(94% 0.004 250)', label: '94' }, { hex: 'oklch(88% 0.005 250)', label: '88' },
+        { hex: 'oklch(78% 0.006 250)', label: '78' }, { hex: 'oklch(62% 0.006 250)', label: '62' },
+        { hex: 'oklch(48% 0.007 250)', label: '48' }, { hex: 'oklch(18% 0.008 250)', label: '18' },
+      ],
+      darkRamp: [
+        { hex: 'oklch(19% 0.006 250)', label: '19' }, { hex: 'oklch(23% 0.007 250)', label: '23' },
+        { hex: 'oklch(27% 0.007 250)', label: '27' }, { hex: 'oklch(32% 0.008 250)', label: '32' },
+        { hex: 'oklch(40% 0.007 250)', label: '40' }, { hex: 'oklch(52% 0.008 250)', label: '52' },
+        { hex: 'oklch(68% 0.006 250)', label: '68' }, { hex: 'oklch(94% 0.004 250)', label: '94' },
+      ],
+      tabs: tabDefs.map(t => ({
+        label: t.label,
+        onClick: () => this.setState({ activeTab: t.key }),
+        style: {
+          padding: '7px 14px', borderRadius: 6, fontSize: 12.5, fontWeight: 600, cursor: 'pointer',
+          border: '1px solid ' + (active === t.key ? 'oklch(52% 0.14 145)' : 'oklch(88% 0.005 250)'),
+          background: active === t.key ? 'oklch(52% 0.14 145)' : '#fff',
+          color: active === t.key ? '#fff' : 'oklch(38% 0.007 250)',
+        },
+      })),
+      tabHoverStyle: { filter: 'brightness(0.97)' },
+      spinAnim: isLoading ? 'portly-spin 1s linear infinite' : 'none',
+      isEmpty, isLoading, isNormal: !isEmpty && !isLoading,
+      isPermissionTab: active === 'permission',
+      skeletons: [0, 1, 2].map(i => ({ delay: (i * 0.15) + 's' })),
+      liveRows, historyRows, hasHistory: historyRows.length > 0,
+      footerCountText: isLoading ? 'Scanning…' : activeCount + ' active',
+    };
+  }
+}
+</script>
+</body>
+</html>

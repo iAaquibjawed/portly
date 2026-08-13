@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<sc-if value="{{ isHistory }}" hint-placeholder-val="{{ false }}">
+  <div style="display:flex;align-items:center;gap:8px;padding:{{ padV }}px 14px;opacity:0.55;">
+    <div style="width:8px;height:1.5px;background:{{ t.textTertiary }};flex-shrink:0;margin:0 6px 0 2px;"></div>
+    <div style="flex:1;min-width:0;display:flex;align-items:baseline;gap:6px;font-size:12.5px;color:{{ t.textSecondary }};overflow:hidden;white-space:nowrap;">
+      <span style="font-weight:600;text-decoration:line-through;font-variant-numeric:tabular-nums;color:{{ t.textTertiary }};">{{ port }}</span>
+      <span>·</span>
+      <span style="overflow:hidden;text-overflow:ellipsis;">{{ project }}</span>
+      <span style="color:{{ t.textTertiary }};">— ended {{ uptime }}</span>
+    </div>
+  </div>
+</sc-if>
+<sc-if value="{{ isNotHistory }}" hint-placeholder-val="{{ true }}">
+<div style="padding:{{ padV }}px 14px;transition:opacity 220ms ease, max-height 220ms ease;opacity:{{ rowOpacity }};max-height:{{ rowMaxHeight }};overflow:hidden;" style-hover="{{ hoverStyle }}" onMouseEnter="{{ onHoverEnter }}" onMouseLeave="{{ onHoverLeave }}">
+  <div style="display:flex;align-items:center;gap:8px;">
+    <div style="width:16px;height:16px;flex-shrink:0;display:flex;align-items:center;justify-content:center;position:relative;">
+      <sc-if value="{{ glyph.type }}" hint-placeholder-val="circle">
+        <div style="width:8px;height:8px;border-radius:50%;background:{{ t.textSecondary }};display:{{ glyph.circleDisplay }};"></div>
+      </sc-if>
+      <div style="position:absolute;width:14px;height:14px;border-radius:50%;border:1px solid {{ t.textSecondary }};display:{{ glyph.ringDisplay }};"></div>
+      <div style="width:8px;height:8px;border:1.5px solid {{ t.textSecondary }};display:{{ glyph.squareDisplay }};"></div>
+      <div style="width:9px;height:9px;border-radius:50%;border:1.5px dashed {{ t.textSecondary }};display:{{ glyph.dashedDisplay }};"></div>
+    </div>
+    <div style="flex:1;min-width:0;font-size:13.5px;font-weight:600;color:{{ t.textPrimary }};overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{ project }}</div>
+    <div style="flex-shrink:0;font-size:13px;font-weight:600;font-variant-numeric:tabular-nums;color:{{ t.textPrimary }};min-width:44px;text-align:right;">{{ port }}</div>
+  </div>
+  <div style="display:flex;align-items:center;gap:6px;margin-top:2px;padding-left:24px;">
+    <sc-if value="{{ killConfirm }}" hint-placeholder-val="{{ false }}">
+      <div style="flex:1;display:flex;align-items:center;gap:8px;font-size:11.5px;">
+        <span style="color:{{ t.danger }};font-weight:600;">Kill {{ process }} ({{ pid }})?</span>
+        <a href="javascript:void(0)" onClick="{{ onCancelKill }}" style="color:{{ t.textSecondary }};" style-hover="{{ linkHover }}">Cancel</a>
+        <a href="javascript:void(0)" onClick="{{ onConfirmKill }}" style="color:{{ t.danger }};font-weight:600;" style-hover="{{ linkHover }}">Kill</a>
+      </div>
+    </sc-if>
+    <sc-if value="{{ !killConfirm && !moreOpen }}" hint-placeholder-val="{{ true }}">
+      <div style="flex:1;min-width:0;font-size:11.5px;color:{{ t.textTertiary }};overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
+        <sc-if value="{{ isPermission }}" hint-placeholder-val="{{ false }}"><span>permission needed</span></sc-if>
+        <sc-if value="{{ !isPermission }}" hint-placeholder-val="{{ true }}"><span>{{ process }} · {{ pid }}<sc-if value="{{ title }}" hint-placeholder-val="{{ false }}"> · {{ title }}</sc-if></span></sc-if>
+      </div>
+      <sc-if value="{{ isPermission }}" hint-placeholder-val="{{ false }}">
+        <div style="flex-shrink:0;font-size:11px;color:{{ t.textTertiary }};">no access</div>
+      </sc-if>
+      <sc-if value="{{ showActions }}" hint-placeholder-val="{{ false }}">
+        <div style="flex-shrink:0;display:flex;align-items:center;gap:4px;">
+          <a href="javascript:void(0)" onClick="{{ onOpen }}" title="{{ openTitle }}" style="width:18px;height:18px;display:flex;align-items:center;justify-content:center;font-size:12px;color:{{ openColor }};cursor:{{ openCursor }};border-radius:4px;" style-hover="{{ actionHover }}">↗</a>
+          <a href="javascript:void(0)" onClick="{{ onToggleMore }}" style="width:18px;height:18px;display:flex;align-items:center;justify-content:center;font-size:13px;color:{{ t.textSecondary }};border-radius:4px;" style-hover="{{ actionHover }}">⋯</a>
+          <a href="javascript:void(0)" onClick="{{ onKill }}" style="width:18px;height:18px;display:flex;align-items:center;justify-content:center;font-size:12px;color:{{ t.textSecondary }};border-radius:4px;" style-hover="{{ actionHover }}">✕</a>
+        </div>
+      </sc-if>
+      <sc-if value="{{ showUptime }}" hint-placeholder-val="{{ true }}">
+        <div style="flex-shrink:0;font-size:11px;color:{{ t.textTertiary }};font-variant-numeric:tabular-nums;">{{ uptime }}</div>
+      </sc-if>
+    </sc-if>
+    <sc-if value="{{ moreOpen && !killConfirm }}" hint-placeholder-val="{{ false }}">
+      <div style="flex:1;display:flex;align-items:center;gap:10px;font-size:11.5px;">
+        <a href="javascript:void(0)" onClick="{{ onCopy }}" style="color:{{ t.textSecondary }};" style-hover="{{ linkHover }}">Copy URL</a>
+        <a href="javascript:void(0)" onClick="{{ onReveal }}" style="color:{{ t.textSecondary }};" style-hover="{{ linkHover }}">Reveal in Finder</a>
+        <a href="javascript:void(0)" onClick="{{ onToggleMore }}" style="color:{{ t.textTertiary }};margin-left:auto;">×</a>
+      </div>
+    </sc-if>
+  </div>
+</div>
+</sc-if>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:400,&quot;height&quot;:56},&quot;theme&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;default&quot;:&quot;light&quot;,&quot;options&quot;:[&quot;light&quot;,&quot;dark&quot;],&quot;tsType&quot;:&quot;string&quot;},&quot;port&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;5173&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;project&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;my-shop-frontend&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;variant&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;default&quot;:&quot;normal&quot;,&quot;options&quot;:[&quot;normal&quot;,&quot;nonhttp&quot;,&quot;permission&quot;,&quot;history&quot;],&quot;tsType&quot;:&quot;string&quot;}}">
+class Component extends DCLogic {
+  state = { hovered: false };
+  renderVals() {
+    const p = this.props;
+    const dark = p.theme === 'dark';
+    const variant = p.variant || 'normal';
+    const t = dark ? {
+      textPrimary: 'oklch(94% 0.004 250)', textSecondary: 'oklch(68% 0.006 250)',
+      textTertiary: 'oklch(52% 0.008 250)', hoverBg: 'oklch(24% 0.008 250)',
+      danger: 'oklch(68% 0.16 25)',
+    } : {
+      textPrimary: 'oklch(18% 0.008 250)', textSecondary: 'oklch(48% 0.007 250)',
+      textTertiary: 'oklch(62% 0.006 250)', hoverBg: 'oklch(96% 0.003 250)',
+      danger: 'oklch(52% 0.19 25)',
+    };
+    const glyphMap = {
+      http: { circleDisplay: 'block', ringDisplay: 'none', squareDisplay: 'none', dashedDisplay: 'none' },
+      https: { circleDisplay: 'block', ringDisplay: 'block', squareDisplay: 'none', dashedDisplay: 'none' },
+      nonhttp: { circleDisplay: 'none', ringDisplay: 'none', squareDisplay: 'block', dashedDisplay: 'none' },
+      unknown: { circleDisplay: 'none', ringDisplay: 'none', squareDisplay: 'none', dashedDisplay: 'block' },
+    };
+    const isPermission = variant === 'permission';
+    const isNonHttp = variant === 'nonhttp';
+    const isHistory = variant === 'history';
+    const glyph = glyphMap[isPermission ? 'unknown' : (isNonHttp ? 'nonhttp' : (p.protocol || 'http'))];
+    const openDisabled = isNonHttp || isPermission;
+    const showActions = !isPermission && this.state.hovered;
+    const showUptime = !isPermission && !this.state.hovered;
+    return {
+      showActions, showUptime,
+      onHoverEnter: () => this.setState({ hovered: true }),
+      onHoverLeave: () => this.setState({ hovered: false }),
+      t, glyph, isHistory, isNotHistory: !isHistory, isPermission,
+      port: p.port, project: p.project, process: p.process, pid: p.pid,
+      title: p.title, uptime: p.uptime, killConfirm: !!p.killConfirm, moreOpen: !!p.moreOpen,
+      padV: p.compact ? 8 : 10,
+      rowOpacity: p.removing ? 0 : 1,
+      rowMaxHeight: p.removing ? '0px' : '60px',
+      hoverStyle: { background: t.hoverBg },
+      linkHover: { textDecoration: 'underline' },
+      actionHover: { background: dark ? 'oklch(30% 0.01 250)' : 'oklch(90% 0.005 250)' },
+      openDisabled, openColor: openDisabled ? t.textTertiary : t.textSecondary,
+      openCursor: openDisabled ? 'default' : 'pointer',
+      openTitle: openDisabled ? 'Not an HTTP server' : 'Open in browser',
+      onOpen: openDisabled ? (e) => e.preventDefault() : (p.onOpen || (() => {})),
+      onCopy: p.onCopy || (() => {}), onReveal: p.onReveal || (() => {}),
+      onKill: p.onKill || (() => {}), onConfirmKill: p.onConfirmKill || (() => {}),
+      onCancelKill: p.onCancelKill || (() => {}), onToggleMore: p.onToggleMore || (() => {}),
+    };
+  }
+}
+</script>
+</body>
+</html>
